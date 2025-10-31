@@ -8,60 +8,77 @@ datasource db {
 }
 
 model User {
-  id             String         @id @default(uuid())
-  name           String
-  nickname       String         @unique
-  passwordHash   String         @map("password_hash")
-  createdAt      DateTime       @default(now()) @map("created_at")
+  id           String   @id @default(uuid())
+  name         String
+  nickname     String   @unique
+  passwordHash String   @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  // Relações
   leaguesCreated League[]       @relation("LeagueCreator")
-  leagueMembers  LeagueMember[]
+  leagueMembers  LeagueMember[] @relation("LeagueMembership")
   predictions    Prediction[]
 }
 
 model League {
-  id          String         @id @default(uuid())
-  name        String
-  createdBy   String
-  createdAt   DateTime       @default(now()) @map("created_at")
-  creator     User           @relation("LeagueCreator", fields: [createdBy], references: [id])
-  members     LeagueMember[]
+  id         String   @id @default(uuid())
+  name       String
+  createdBy  String
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  // Relações
+  creator   User           @relation("LeagueCreator", fields: [createdBy], references: [id])
+  members   LeagueMember[] @relation("LeagueMembership")
   predictions Prediction[]
 }
 
 model LeagueMember {
-  id       String   @id @default(uuid())
-  leagueId String
-  userId   String
-  joinedAt DateTime @default(now()) @map("joined_at")
-  league   League   @relation(fields: [leagueId], references: [id])
-  user     User     @relation(fields: [userId], references: [id])
+  id        String   @id @default(uuid())
+  leagueId  String
+  userId    String
+  joinedAt  DateTime @default(now()) @map("joined_at")
+
+  league League @relation("LeagueMembership", fields: [leagueId], references: [id])
+  user   User   @relation("LeagueMembership", fields: [userId], references: [id])
 
   @@unique([leagueId, userId])
 }
 
 model Match {
-  id          String       @id @default(uuid())
-  homeTeam    String
-  awayTeam    String
-  matchDate   DateTime     @map("match_date")
-  homeScore   Int?
-  awayScore   Int?
-  createdAt   DateTime     @default(now()) @map("created_at")
+  id         String   @id @default(uuid())
+  homeId     String
+  awayId     String
+  matchDate  DateTime @map("match_date")
+  homeScore  Int?
+  awayScore  Int?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  homeTeam  Team  @relation("HomeTeam", fields: [homeId], references: [id])
+  awayTeam  Team  @relation("AwayTeam", fields: [awayId], references: [id])
   predictions Prediction[]
 }
 
 model Prediction {
-  id        String   @id @default(uuid())
-  matchId   String
-  userId    String
-  leagueId  String
-  homeGuess Int
-  awayGuess Int
-  points    Int      @default(0)
-  createdAt DateTime @default(now()) @map("created_at")
-  league    League   @relation(fields: [leagueId], references: [id])
-  match     Match    @relation(fields: [matchId], references: [id])
-  user      User     @relation(fields: [userId], references: [id])
+  id         String   @id @default(uuid())
+  matchId    String
+  userId     String
+  leagueId   String
+  homeGuess  Int
+  awayGuess  Int
+  points     Int      @default(0)
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  match  Match  @relation(fields: [matchId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+  league League @relation(fields: [leagueId], references: [id])
 
   @@unique([matchId, userId, leagueId])
+}
+
+model Team {
+  id   String @id @default(uuid())
+  name String
+
+  homeMatches Match[] @relation("HomeTeam")
+  awayMatches Match[] @relation("AwayTeam")
 }
