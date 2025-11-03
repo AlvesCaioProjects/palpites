@@ -77,7 +77,7 @@ model Prediction {
 
 model Team {
   id   String @id @default(uuid())
-  name String
+  name String @unique
 
   homeMatches Match[] @relation("HomeTeam")
   awayMatches Match[] @relation("AwayTeam")
