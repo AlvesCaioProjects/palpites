@@ -1,8 +1,12 @@
 {
   "dependencies": {
-    "dotenv": "^17.2.3"
+    "@types/prompt-sync": "^4.2.3",
+    "bcrypt": "^6.0.0",
+    "dotenv": "^17.2.3",
+    "prompt-sync": "^4.2.0"
   },
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
     "@types/dotenv": "^6.1.1",
     "typescript": "^5.9.3"
   }
